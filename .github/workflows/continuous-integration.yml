@@ -1,0 +1,26 @@
+name: CI
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  ci:
+    name: Tests & CodeQL & SonarCloud
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: ⬇️ Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: ☕ Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: maven
+
+      - name: ✅ Run Unit Test
+        run: mvn -B package
