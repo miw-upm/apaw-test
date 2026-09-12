@@ -1,18 +1,16 @@
-package es.upm.miw.apaw.functionaltests;
+package es.upm.miw.apaw.functionaltests.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
-
-@Builder
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDto {
-    private UUID id;
+public class UserFindCriteria {
+    private Boolean active;
     private String mobile;
-    private String firstName;
+    private Boolean billable;
 }

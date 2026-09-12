@@ -2,9 +2,7 @@ spring:
   application:
     name: apaw-test
   profiles:
-    # Profile ----------------------------------------
-    active: dev
-  # ------------------------------------------------
+    default: dev
   output:
     ansi:
       enabled: ALWAYS

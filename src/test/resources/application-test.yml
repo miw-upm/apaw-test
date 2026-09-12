@@ -1,3 +1,16 @@
 logging:
   level:
     es.upm.miw: DEBUG
+
+test:
+  api:
+    apaw-user: http://localhost:8080/api/apaw-user
+
+spring:
+  cloud:
+    openfeign:
+      client:
+        config:
+          users:
+            connectTimeout: 5000
+            readTimeout: 10000

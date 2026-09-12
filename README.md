@@ -17,3 +17,30 @@ bases de datos con JPA soportado por Hibernate y Postgres.
 ```
 2. Importar el proyecto mediante **IntelliJ IDEA**
    * **Open**, y seleccionar la carpeta del proyecto.
+
+### Pruebas funcionales de usuarios con OpenFeign
+
+Arranca previamente `apaw-user` y el gateway para que la API esté disponible en
+`http://localhost:8080/api/apaw-user`. Las pruebas realizan peticiones HTTP reales,
+crean usuarios de prueba y los eliminan al terminar; utiliza una base de datos de desarrollo.
+
+```sh
+mvn verify -Dit.test=UserResourceFT
+```
+
+La URL se configura en `src/test/resources/application-test.yml`. Se puede cambiar
+con la variable `APAW_USER_URL` o mediante una propiedad de Maven:
+
+```sh
+mvn verify -Dit.test=UserResourceFT -Dtest.api.base-url=http://localhost:8081
+```
+
+`UserClient` declara las llamadas con `@FeignClient` y envía los filtros de
+`UserFindCriteria` como parámetros de consulta con `@SpringQueryMap`.
+Las lecturas individuales usan `/{id}` y `/{mobile}`, tal como están declaradas
+en el controlador; el alta y la búsqueda usan `/users`, y el borrado `/users/{id}`.
+
+`UserResourceFT` comprueba alta, lectura por UUID y móvil, búsqueda resumida,
+filtros por móvil y estado, borrado, respuestas 404 y validaciones 400.
+El contexto de Spring de las pruebas habilita Feign sin arrancar un servidor web.
+`mvn test` no ejecuta estas pruebas externas; se ejecutan con Failsafe en `verify`.
