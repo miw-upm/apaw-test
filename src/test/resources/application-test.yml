@@ -5,6 +5,7 @@ logging:
 test:
   api:
     apaw-user: http://localhost:8080/api/apaw-user
+    apaw-practice: http://localhost:8080/api/apaw-practice
 
 spring:
   cloud:

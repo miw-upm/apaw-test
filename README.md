@@ -21,10 +21,7 @@
 Arranca previamente todos los microservicios: `apaw-eureka`, `apaw-user`, `apaw-practice` y `apaw-gateway` con Docker.
 Las pruebas realizan peticiones HTTP reales, usan los datos de `SeederForDev`.
 
-```sh
-mvn verify
-```
-
 La URL se configura en `src/test/resources/application-test.yml`.
 `UserClient` declara las llamadas con `@FeignClient`.
+
 Crear un paquete por cada api, y dentro del api `apaw-practice` un paquete por cada `Epic`.
