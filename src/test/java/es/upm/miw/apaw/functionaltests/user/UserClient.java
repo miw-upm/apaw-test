@@ -17,10 +17,10 @@ public interface UserClient {
     @PostMapping("/users")
     void create(@RequestBody UserDto user);
 
-    @GetMapping("/{id}")
+    @GetMapping("/users/{id}")
     UserDto readById(@PathVariable("id") UUID id);
 
-    @GetMapping("/{id}")
+    @GetMapping("/users/{id}")
     UserDto readByMobile(@PathVariable("id") String mobile);
 
     @GetMapping("/users")
