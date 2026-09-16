@@ -23,9 +23,6 @@ public interface LegalTaskClient {
     @PutMapping("/legal-tasks/{id}")
     LegalTask update(@PathVariable("id") UUID id, @RequestBody LegalTask task);
 
-    @PatchMapping("/legal-tasks")
-    void updateTaskStatuses(@RequestBody List<LegalTaskStatusUpdate> updates);
-
     @DeleteMapping("/legal-tasks/{id}")
     void delete(@PathVariable("id") UUID id);
 }

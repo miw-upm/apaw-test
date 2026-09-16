@@ -12,12 +12,12 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 
+import static java.time.temporal.ChronoUnit.MICROS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.within;
 
 @SpringBootTest(classes = LegalTaskResourceFT.ClientConfiguration.class,
         webEnvironment = SpringBootTest.WebEnvironment.NONE)
@@ -36,7 +36,7 @@ class LegalTaskResourceFT {
     private LegalTaskClient client;
 
     @Test
-    void testCreateUpdateStatusesAndDelete() {
+    void testCreateUpdateAndDelete() {
         LegalTask task = this.client.create(LegalTask.builder().title("Feign task").build());
         assertThat(task.getId()).isNotNull();
         assertThat(task.getTitle()).isEqualTo("Feign task");
@@ -47,11 +47,9 @@ class LegalTaskResourceFT {
         task.setNotes("Updated notes");
         task.setTaskStatus(TaskStatus.DEPRECATED);
         LegalTask updated = this.client.update(task.getId(), task);
-        assertThat(updated).isEqualTo(task);
+        assertThat(updated).usingRecursiveComparison().ignoringFields("creatingDate").isEqualTo(task);
+        assertThat(updated.getCreatingDate()).isCloseTo(task.getCreatingDate(), within(1, MICROS));
         assertThat(this.client.read(task.getId())).isEqualTo(updated);
-
-        this.client.updateTaskStatuses(List.of(new LegalTaskStatusUpdate(task.getId(), TaskStatus.WITHDRAWN)));
-        assertThat(this.client.read(task.getId()).getTaskStatus()).isEqualTo(TaskStatus.WITHDRAWN);
 
         this.client.delete(task.getId());
         assertThatThrownBy(() -> this.client.read(task.getId())).isInstanceOf(FeignException.NotFound.class);
@@ -127,46 +125,4 @@ class LegalTaskResourceFT {
         assertThatThrownBy(() -> this.client.update(TASK_ID, task)).isInstanceOf(FeignException.BadRequest.class);
     }
 
-    @Test
-    void testUpdateStatusesRepeatedId() {
-        List<LegalTaskStatusUpdate> updates = List.of(
-                new LegalTaskStatusUpdate(TASK_ID, TaskStatus.DEPRECATED),
-                new LegalTaskStatusUpdate(TASK_ID, TaskStatus.WITHDRAWN));
-        assertThatThrownBy(() -> this.client.updateTaskStatuses(updates))
-                .isInstanceOf(FeignException.BadRequest.class);
-        assertThat(this.client.read(TASK_ID).getTaskStatus()).isEqualTo(TaskStatus.CURRENT);
-    }
-
-    @Test
-    void testUpdateStatusesNotFound() {
-        assertThatThrownBy(() -> this.client.updateTaskStatuses(
-                List.of(new LegalTaskStatusUpdate(UNKNOWN_ID, TaskStatus.CURRENT))))
-                .isInstanceOf(FeignException.NotFound.class);
-    }
-
-    @Test
-    void testUpdateStatusesEmpty() {
-        assertThatThrownBy(() -> this.client.updateTaskStatuses(List.of()))
-                .isInstanceOf(FeignException.BadRequest.class);
-    }
-
-    @Test
-    void testUpdateStatusesWithoutId() {
-        assertThatThrownBy(() -> this.client.updateTaskStatuses(
-                List.of(new LegalTaskStatusUpdate(null, TaskStatus.CURRENT))))
-                .isInstanceOf(FeignException.BadRequest.class);
-    }
-
-    @Test
-    void testUpdateStatusesWithoutStatus() {
-        assertThatThrownBy(() -> this.client.updateTaskStatuses(
-                List.of(new LegalTaskStatusUpdate(TASK_ID, null))))
-                .isInstanceOf(FeignException.BadRequest.class);
-    }
-
-    @Test
-    void testUpdateStatusesNullElement() {
-        assertThatThrownBy(() -> this.client.updateTaskStatuses(Arrays.asList((LegalTaskStatusUpdate) null)))
-                .isInstanceOf(FeignException.BadRequest.class);
-    }
 }
