@@ -10,6 +10,9 @@ test:
 spring:
   cloud:
     openfeign:
+      httpclient:
+        hc5:
+          enabled: true
       client:
         config:
           users:
