@@ -37,8 +37,58 @@ class CourtResourceFT {
     private CourtHearingClient client;
 
     @Test
-    void testCreateUpdatePatchAndDelete() {
-        Court court = Court.builder()
+        void testCreateCourt() {
+                Court court = this.newCourt();
+
+                Court created = this.client.createCourt(court);
+
+                assertThat(created.getId()).isNotNull();
+                assertThat(created.getName()).isEqualTo(court.getName());
+                assertThat(created.getType()).isEqualTo(CourtType.CIVIL);
+                this.client.deleteCourt(created.getId());
+        }
+
+        @Test
+        void testUpdateCourt() {
+                Court created = this.client.createCourt(this.newCourt());
+
+                Court updated = this.client.updateCourt(created.getId(), Court.builder()
+                                .name(created.getName())
+                                .address("Updated Street 2")
+                                .city("Barcelona")
+                                .phone("930000000")
+                                .openingTime(LocalTime.of(8, 30))
+                                .closingTime(LocalTime.of(16, 0))
+                                .type(CourtType.APPEAL)
+                                .build());
+                assertThat(updated.getAddress()).isEqualTo("Updated Street 2");
+                assertThat(updated.getCity()).isEqualTo("Barcelona");
+                assertThat(updated.getType()).isEqualTo(CourtType.APPEAL);
+                this.client.deleteCourt(created.getId());
+        }
+
+        @Test
+        void testPatchCourt() {
+                Court created = this.client.createCourt(this.newCourt());
+
+                Court patched = this.client.patchCourt(created.getId(),
+                                CourtUpdate.builder().phone("940000000").build());
+                assertThat(patched.getPhone()).isEqualTo("940000000");
+                assertThat(patched.getCity()).isEqualTo("Madrid");
+                this.client.deleteCourt(created.getId());
+        }
+
+        @Test
+        void testDeleteCourt() {
+                Court created = this.client.createCourt(this.newCourt());
+
+                this.client.deleteCourt(created.getId());
+                assertThatThrownBy(() -> this.client.readCourt(created.getId()))
+                                .isInstanceOf(FeignException.NotFound.class);
+        }
+
+        private Court newCourt() {
+                return Court.builder()
                 .name("Functional Court " + UUID.randomUUID())
                 .address("Test Street 1")
                 .city("Madrid")
@@ -47,33 +97,6 @@ class CourtResourceFT {
                 .closingTime(LocalTime.of(17, 0))
                 .type(CourtType.CIVIL)
                 .build();
-
-        Court created = this.client.createCourt(court);
-        assertThat(created.getId()).isNotNull();
-        assertThat(created.getName()).isEqualTo(court.getName());
-        assertThat(created.getType()).isEqualTo(CourtType.CIVIL);
-
-        Court updated = this.client.updateCourt(created.getId(), Court.builder()
-                .name(created.getName())
-                .address("Updated Street 2")
-                .city("Barcelona")
-                .phone("930000000")
-                .openingTime(LocalTime.of(8, 30))
-                .closingTime(LocalTime.of(16, 0))
-                .type(CourtType.APPEAL)
-                .build());
-        assertThat(updated.getAddress()).isEqualTo("Updated Street 2");
-        assertThat(updated.getCity()).isEqualTo("Barcelona");
-        assertThat(updated.getType()).isEqualTo(CourtType.APPEAL);
-
-        Court patched = this.client.patchCourt(created.getId(),
-                CourtUpdate.builder().phone("940000000").build());
-        assertThat(patched.getPhone()).isEqualTo("940000000");
-        assertThat(patched.getCity()).isEqualTo("Barcelona");
-
-        this.client.deleteCourt(created.getId());
-        assertThatThrownBy(() -> this.client.readCourt(created.getId()))
-                .isInstanceOf(FeignException.NotFound.class);
     }
 
     @Test
