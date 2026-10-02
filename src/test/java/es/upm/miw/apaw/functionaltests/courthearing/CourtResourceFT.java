@@ -21,11 +21,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @ActiveProfiles("test")
 class CourtResourceFT {
     private static final UUID COURT_0_ID = UUID.fromString("cccccccc-dddd-eeee-ffff-aaaaaaaa0000");
-    private static final UUID COURT_1_ID = UUID.fromString("cccccccc-dddd-eeee-ffff-aaaaaaaa0001");
-    private static final UUID COURT_2_ID = UUID.fromString("cccccccc-dddd-eeee-ffff-aaaaaaaa0002");
-    private static final UUID COURT_3_ID = UUID.fromString("cccccccc-dddd-eeee-ffff-aaaaaaaa0003");
-    private static final UUID COURT_4_ID = UUID.fromString("cccccccc-dddd-eeee-ffff-aaaaaaaa0004");
+        private static final UUID COURT_1_ID = UUID.fromString("cccccccc-dddd-eeee-ffff-aaaaaaaa0001");
+        private static final UUID COURT_2_ID = UUID.fromString("cccccccc-dddd-eeee-ffff-aaaaaaaa0002");
+        private static final UUID COURT_3_ID = UUID.fromString("cccccccc-dddd-eeee-ffff-aaaaaaaa0003");
+        private static final UUID COURT_4_ID = UUID.fromString("cccccccc-dddd-eeee-ffff-aaaaaaaa0004");
     private static final UUID UNKNOWN_ID = UUID.fromString("cccccccc-dddd-eeee-ffff-aaaaaaaa9999");
+        private static final String EXISTING_COURT_NAME = "Tribunal Supremo";
+        private static final String EXISTING_COURT_PHONE = "915000000";
 
     @Configuration
     @EnableAutoConfiguration
@@ -37,58 +39,58 @@ class CourtResourceFT {
     private CourtHearingClient client;
 
     @Test
-        void testCreateCourt() {
-                Court court = this.newCourt();
+    void testCreateCourt() {
+        Court court = this.newCourt();
 
-                Court created = this.client.createCourt(court);
+        Court created = this.client.createCourt(court);
 
-                assertThat(created.getId()).isNotNull();
-                assertThat(created.getName()).isEqualTo(court.getName());
-                assertThat(created.getType()).isEqualTo(CourtType.CIVIL);
-                this.client.deleteCourt(created.getId());
-        }
+        assertThat(created.getId()).isNotNull();
+        assertThat(created.getName()).isEqualTo(court.getName());
+        assertThat(created.getType()).isEqualTo(CourtType.CIVIL);
+        this.client.deleteCourt(created.getId());
+    }
 
-        @Test
-        void testUpdateCourt() {
-                Court created = this.client.createCourt(this.newCourt());
+    @Test
+    void testUpdateCourt() {
+        Court created = this.client.createCourt(this.newCourt());
 
-                Court updated = this.client.updateCourt(created.getId(), Court.builder()
-                                .name(created.getName())
-                                .address("Updated Street 2")
-                                .city("Barcelona")
-                                .phone("930000000")
-                                .openingTime(LocalTime.of(8, 30))
-                                .closingTime(LocalTime.of(16, 0))
-                                .type(CourtType.APPEAL)
-                                .build());
-                assertThat(updated.getAddress()).isEqualTo("Updated Street 2");
-                assertThat(updated.getCity()).isEqualTo("Barcelona");
-                assertThat(updated.getType()).isEqualTo(CourtType.APPEAL);
-                this.client.deleteCourt(created.getId());
-        }
+        Court updated = this.client.updateCourt(created.getId(), Court.builder()
+                .name(created.getName())
+                .address("Updated Street 2")
+                .city("Barcelona")
+                .phone("930000000")
+                .openingTime(LocalTime.of(8, 30))
+                .closingTime(LocalTime.of(16, 0))
+                .type(CourtType.APPEAL)
+                .build());
+        assertThat(updated.getAddress()).isEqualTo("Updated Street 2");
+        assertThat(updated.getCity()).isEqualTo("Barcelona");
+        assertThat(updated.getType()).isEqualTo(CourtType.APPEAL);
+        this.client.deleteCourt(created.getId());
+    }
 
-        @Test
-        void testPatchCourt() {
-                Court created = this.client.createCourt(this.newCourt());
+    @Test
+    void testPatchCourt() {
+        Court created = this.client.createCourt(this.newCourt());
 
-                Court patched = this.client.patchCourt(created.getId(),
-                                CourtUpdate.builder().phone("940000000").build());
-                assertThat(patched.getPhone()).isEqualTo("940000000");
-                assertThat(patched.getCity()).isEqualTo("Madrid");
-                this.client.deleteCourt(created.getId());
-        }
+        Court patched = this.client.patchCourt(created.getId(),
+                CourtUpdate.builder().phone("940000000").build());
+        assertThat(patched.getPhone()).isEqualTo("940000000");
+        assertThat(patched.getCity()).isEqualTo("Madrid");
+        this.client.deleteCourt(created.getId());
+    }
 
-        @Test
-        void testDeleteCourt() {
-                Court created = this.client.createCourt(this.newCourt());
+    @Test
+    void testDeleteCourt() {
+        Court created = this.client.createCourt(this.newCourt());
 
-                this.client.deleteCourt(created.getId());
-                assertThatThrownBy(() -> this.client.readCourt(created.getId()))
-                                .isInstanceOf(FeignException.NotFound.class);
-        }
+        this.client.deleteCourt(created.getId());
+        assertThatThrownBy(() -> this.client.readCourt(created.getId()))
+                .isInstanceOf(FeignException.NotFound.class);
+    }
 
-        private Court newCourt() {
-                return Court.builder()
+    private Court newCourt() {
+        return Court.builder()
                 .name("Functional Court " + UUID.randomUUID())
                 .address("Test Street 1")
                 .city("Madrid")
@@ -98,6 +100,58 @@ class CourtResourceFT {
                 .type(CourtType.CIVIL)
                 .build();
     }
+
+        @Test
+        void testCreateCourtWithDuplicateName() {
+                Court court = this.newCourt();
+                court.setName(EXISTING_COURT_NAME);
+
+                assertThatThrownBy(() -> this.client.createCourt(court))
+                                .isInstanceOf(FeignException.Conflict.class);
+        }
+
+        @Test
+        void testCreateCourtWithDuplicatePhone() {
+                Court court = this.newCourt();
+                court.setPhone(EXISTING_COURT_PHONE);
+
+                assertThatThrownBy(() -> this.client.createCourt(court))
+                                .isInstanceOf(FeignException.Conflict.class);
+        }
+
+        @Test
+        void testUpdateCourtWithDuplicateName() {
+                Court update = this.newCourt();
+                update.setName(EXISTING_COURT_NAME);
+
+                assertThatThrownBy(() -> this.client.updateCourt(COURT_4_ID, update))
+                                .isInstanceOf(FeignException.Conflict.class);
+        }
+
+        @Test
+        void testUpdateCourtWithDuplicatePhone() {
+                Court update = this.newCourt();
+                update.setPhone(EXISTING_COURT_PHONE);
+
+                assertThatThrownBy(() -> this.client.updateCourt(COURT_4_ID, update))
+                                .isInstanceOf(FeignException.Conflict.class);
+        }
+
+        @Test
+        void testPatchCourtWithDuplicateName() {
+                CourtUpdate update = CourtUpdate.builder().name(EXISTING_COURT_NAME).build();
+
+                assertThatThrownBy(() -> this.client.patchCourt(COURT_4_ID, update))
+                                .isInstanceOf(FeignException.Conflict.class);
+        }
+
+        @Test
+        void testPatchCourtWithDuplicatePhone() {
+                CourtUpdate update = CourtUpdate.builder().phone(EXISTING_COURT_PHONE).build();
+
+                assertThatThrownBy(() -> this.client.patchCourt(COURT_4_ID, update))
+                                .isInstanceOf(FeignException.Conflict.class);
+        }
 
     @Test
     void testReadSeededCourt() {

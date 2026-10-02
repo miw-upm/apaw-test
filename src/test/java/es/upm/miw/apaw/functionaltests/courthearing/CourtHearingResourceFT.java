@@ -147,4 +147,31 @@ class CourtHearingResourceFT {
         assertThatThrownBy(() -> this.client.createHearing(creation))
                 .isInstanceOf(FeignException.NotFound.class);
     }
+
+    @Test
+    void testCreateWithoutCourt() {
+        CreationCourtHearing creation = this.creation();
+        creation.setCourtId(null);
+
+        assertThatThrownBy(() -> this.client.createHearing(creation))
+                .isInstanceOf(FeignException.BadRequest.class);
+    }
+
+    @Test
+    void testCreateWithoutAttendees() {
+        CreationCourtHearing creation = this.creation();
+        creation.setAttendeeIds(null);
+
+        assertThatThrownBy(() -> this.client.createHearing(creation))
+                .isInstanceOf(FeignException.BadRequest.class);
+    }
+
+    @Test
+    void testCreateWithoutAnyAttendees() {
+        CreationCourtHearing creation = this.creation();
+        creation.setAttendeeIds(List.of());
+
+        assertThatThrownBy(() -> this.client.createHearing(creation))
+                .isInstanceOf(FeignException.BadRequest.class);
+    }
 }
