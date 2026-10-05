@@ -1,8 +1,12 @@
 package es.upm.miw.apaw.functionaltests.training;
 
-import es.upm.miw.apaw.functionaltests.ApiTestConfig;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.test.context.ActiveProfiles;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.annotation.Autowired;
+
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
@@ -11,8 +15,15 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(classes = ApiTestConfig.class)
+@SpringBootTest(classes = TrainingPlanResourceFT.ApiTestConfig.class)
+@ActiveProfiles("test")
 class TrainingPlanResourceFT {
+
+    @Configuration
+    @EnableAutoConfiguration
+    @EnableFeignClients(clients = {TrainingPlanClient.class, CourseClient.class})
+    static class ApiTestConfig {
+    }
 
     @Autowired
     private TrainingPlanClient trainingPlanClient;
