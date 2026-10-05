@@ -16,7 +16,7 @@ public interface CourseClient {
     @PutMapping("/training/courses/{id}")
     Course update(@PathVariable("id") UUID id, @RequestBody Course course);
 
-    @PostMapping("/training/courses/{id}")
+    @DeleteMapping("/training/courses/{id}")
     void delete(@PathVariable("id") UUID id);
 
     @GetMapping("/training/courses")

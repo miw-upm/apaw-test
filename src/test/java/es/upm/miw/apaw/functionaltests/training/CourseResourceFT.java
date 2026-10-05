@@ -1,4 +1,4 @@
-package es.upm.miw.apaw.functionaltests.training;
+﻿package es.upm.miw.apaw.functionaltests.training;
 
 import es.upm.miw.apaw.functionaltests.ApiTestConfig;
 import org.junit.jupiter.api.Test;
@@ -29,13 +29,7 @@ class CourseResourceFT {
         Course created = this.courseClient.create(course);
         assertThat(created.getId()).isNotNull();
         assertThat(created.getName()).isEqualTo(course.getName());
-    
-    @Test
-    void testDelete() {
-        List<Course> courses = this.courseClient.findAll();
-        this.courseClient.delete(courses.get(2).getId()); 
     }
-}
 
     @Test
     void testRead() {
@@ -43,13 +37,7 @@ class CourseResourceFT {
         assertThat(courses).isNotEmpty();
         Course readCourse = this.courseClient.read(courses.get(0).getId());
         assertThat(readCourse.getName()).isEqualTo(courses.get(0).getName());
-    
-    @Test
-    void testDelete() {
-        List<Course> courses = this.courseClient.findAll();
-        this.courseClient.delete(courses.get(2).getId()); 
     }
-}
 
     @Test
     void testUpdate() {
@@ -58,13 +46,7 @@ class CourseResourceFT {
         toUpdate.setDurationHours(toUpdate.getDurationHours() + 5);
         Course updated = this.courseClient.update(toUpdate.getId(), toUpdate);
         assertThat(updated.getDurationHours()).isEqualTo(toUpdate.getDurationHours());
-    
-    @Test
-    void testDelete() {
-        List<Course> courses = this.courseClient.findAll();
-        this.courseClient.delete(courses.get(2).getId()); 
     }
-}
 
     @Test
     void testPatch() {
@@ -74,27 +56,15 @@ class CourseResourceFT {
         this.courseClient.updateDurationHours(List.of(new CourseDurationUpdate(toPatch.getId(), newDuration)));
         Course patched = this.courseClient.read(toPatch.getId());
         
-        assertThat(patched.getDurationHours()).isEqualTo(newDuration + 1); 
-    
-    @Test
-    void testDelete() {
-        List<Course> courses = this.courseClient.findAll();
-        this.courseClient.delete(courses.get(2).getId()); 
+        assertThat(patched.getDurationHours()).isEqualTo(newDuration + 1);
     }
-}
 
     @Test
     void testReport() {
         List<TrainingModalityReport> report = this.courseClient.findModalityReport();
         assertThat(report).isNotEmpty();
-    
-    @Test
-    void testDelete() {
-        List<Course> courses = this.courseClient.findAll();
-        this.courseClient.delete(courses.get(2).getId()); 
     }
-}
-
+    
     @Test
     void testDelete() {
         List<Course> courses = this.courseClient.findAll();

@@ -15,6 +15,6 @@ import java.util.UUID;
 public class CreationTrainingPlan {
     private String planCode;
     private BigDecimal evaluationScore;
-    private List<UUID> coursesIds;
+    private List<UUID> courseIds;
     private List<UUID> userIds;
 }
