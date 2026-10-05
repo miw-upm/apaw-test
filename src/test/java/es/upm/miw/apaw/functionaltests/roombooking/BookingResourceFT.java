@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @ActiveProfiles("test")
 class BookingResourceFT {
     private static final String PREFIX = "11111111-2222-3333-4444-55555555";
-    private static final UUID USER_ID_0 = UUID.fromString(PREFIX + "9000");
+    private static final UUID USER_ID_0 = UUID.fromString("aaaaaaaa-bbbb-cccc-dddd-eeeeffff0000");
     private static final UUID ROOM_ID_0 = UUID.fromString(PREFIX + "0000");
     private static final UUID ROOM_ID_1 = UUID.fromString(PREFIX + "0001");
     private static final UUID BOOKING_ID_0 = UUID.fromString(PREFIX + "1000");
@@ -73,7 +73,7 @@ class BookingResourceFT {
 
     @Test
     void testFindByEstimatedAttendees() {
-        assertThat(this.client.find(BookingFindCriteria.builder().estimatedAttendees(40).build()))
+        assertThat(this.client.find(BookingFindCriteria.builder().estimatedAttendees(50).build()))
                 .extracting(Booking::getId)
                 .contains(BOOKING_ID_0);
 
