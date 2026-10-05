@@ -11,9 +11,9 @@ import java.util.List;
 @FeignClient(name = "training-plans", url = "${test.api.apaw-practice}")
 public interface TrainingPlanClient {
     
-    @PostMapping("/training/training-plan") 
+    @PostMapping("/training/training-plans") 
     TrainingPlan create(@RequestBody CreationTrainingPlan creation);
 
-    @GetMapping("/training/training-plan") 
+    @GetMapping("/training/training-plans") 
     List<TrainingPlan> find(@SpringQueryMap TrainingPlanFindCriteria criteria);
 }

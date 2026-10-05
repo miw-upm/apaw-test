@@ -56,7 +56,7 @@ class CourseResourceFT {
         this.courseClient.updateDurationHours(List.of(new CourseDurationUpdate(toPatch.getId(), newDuration)));
         Course patched = this.courseClient.read(toPatch.getId());
         
-        assertThat(patched.getDurationHours()).isEqualTo(newDuration + 1);
+        assertThat(patched.getDurationHours()).isEqualTo(newDuration);
     }
 
     @Test

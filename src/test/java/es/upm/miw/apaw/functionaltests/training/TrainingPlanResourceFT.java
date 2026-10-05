@@ -40,6 +40,6 @@ class TrainingPlanResourceFT {
                 .courseName("Angular")
                 .build();
         List<TrainingPlan> plans = this.trainingPlanClient.find(criteria);
-        assertThat(plans).isEmpty();
+        assertThat(plans).isNotEmpty();
     }
 }
