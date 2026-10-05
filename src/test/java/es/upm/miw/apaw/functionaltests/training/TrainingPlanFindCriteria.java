@@ -12,7 +12,6 @@ import java.math.BigDecimal;
 @Builder
 public class TrainingPlanFindCriteria {
     private BigDecimal evaluationScore;
-    private Boolean isCompleted;
     private String courseName;
     private String userFirstName;
 }
