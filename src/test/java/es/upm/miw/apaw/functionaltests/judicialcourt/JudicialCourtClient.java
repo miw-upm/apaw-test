@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 
 @FeignClient(name = "judicialcourt-client", url = "${test.api.apaw-practice}/judicial-courts")
-public interface JudicialCourtClient {
+public interface
+JudicialCourtClient {
 
     @PostMapping
     JudicialCourt create(@RequestBody CreationJudicialCourt creation);
@@ -20,6 +21,6 @@ public interface JudicialCourtClient {
                              @RequestParam(required = false) String jurisdiction,
                              @RequestParam(required = false) String userIdentity);
 
-    @GetMapping("/ranking")
+    @GetMapping("/lawyers-ranking")
     List<LawyerCourtRankingReport> ranking();
 }
