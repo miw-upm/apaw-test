@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest(classes = NonWorkingDayResourceFT.ClientConfiguration.class,
@@ -164,6 +165,11 @@ class NonWorkingDayResourceFT {
 
         assertThatThrownBy(() -> this.client.updateRecurrences(updates))
                 .isInstanceOf(FeignException.BadRequest.class);
+    }
+
+    @Test
+    void testDeleteUnknownIdIsIdempotent() {
+        assertThatCode(() -> this.client.delete(UNKNOWN_ID)).doesNotThrowAnyException();
     }
 
     @Test
