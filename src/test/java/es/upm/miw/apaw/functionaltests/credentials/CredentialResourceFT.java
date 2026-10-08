@@ -353,13 +353,27 @@ class CredentialResourceFT {
                         List.of(),
                         CredentialType.REGISTRATION));
 
-        assertThat(this.credentialClient.find(
+        List<Credential> credentials = this.credentialClient.find(
                 CredentialFindCriteria.builder()
                         .userEmail(USER_0_EMAIL)
-                        .build()))
+                        .build());
+
+        assertThat(credentials)
                 .extracting(Credential::getId)
                 .contains(first.getId())
                 .doesNotContain(second.getId());
+
+        assertThat(credentials)
+                .filteredOn(credential -> credential.getId().equals(first.getId()))
+                .singleElement()
+                .satisfies(credential -> {
+                    assertThat(credential.getNumber())
+                            .isEqualTo(first.getNumber());
+                    assertThat(credential.getUser().getEmail())
+                            .isEqualTo(USER_0_EMAIL);
+                    assertThat(credential.getVerifications())
+                            .isNull();
+                });
 
         assertThat(this.credentialClient.find(
                 CredentialFindCriteria.builder()
