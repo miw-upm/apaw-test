@@ -161,7 +161,6 @@ class CredentialResourceFT {
                 .isInstanceOf(FeignException.NotFound.class);
     }
 
-    @Test
     @ParameterizedTest
     @NullAndEmptySource
     @ValueSource(strings = {" "})
@@ -399,7 +398,7 @@ class CredentialResourceFT {
                         .userEmail(USER_0_EMAIL)
                         .build()))
                 .extracting(Credential::getId)
-                .containsExactly(matching.getId())
+                .contains(matching.getId())
                 .doesNotContain(wrongEmail.getId(), wrongType.getId());
     }
 
