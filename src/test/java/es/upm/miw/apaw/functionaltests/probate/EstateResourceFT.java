@@ -63,7 +63,7 @@ class EstateResourceFT {
     @Test
     void testSearchOpened() {
         EstateFindCriteria criteria = EstateFindCriteria.builder()
-                .opened(false)
+                .opened(true)
                 .build();
         List<Estate> estates = this.client.search(criteria);
         assertThat(estates).allSatisfy(estate -> assertThat(estate.getClosingDate()).isNull());
