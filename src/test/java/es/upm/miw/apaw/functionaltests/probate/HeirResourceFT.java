@@ -91,7 +91,7 @@ class HeirResourceFT {
     @Test
     void testDeleteReferenced() {
         assertThatThrownBy(() -> this.client.delete(HEIR_ID))
-                .isInstanceOf(FeignException.NotFound.class);
+                .isInstanceOf(FeignException.Conflict.class);
     }
 
     @Test
