@@ -79,9 +79,10 @@ class HeirResourceFT {
 
     @Test
     void testCreateDuplicateNationalId() {
+        Heir existing = this.client.get(HEIR_ID);
         assertThatThrownBy(() -> this.client.create(Heir.builder()
                 .fullName("Duplicate")
-                .nationalId("NID-" + UUID.randomUUID())
+                .nationalId(existing.getNationalId())
                 .birthDate(LocalDate.of(1991, 1, 1))
                 .sharePercentage(new BigDecimal("10.00"))
                 .build()))
