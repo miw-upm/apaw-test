@@ -40,12 +40,14 @@ class DeadlineResourceFT {
 
     @Configuration
     @EnableAutoConfiguration
-    @EnableFeignClients(clients = DeadlineClient.class)
+    @EnableFeignClients(clients = {DeadlineClient.class, NonWorkingDayClient.class})
     static class ClientConfiguration {
     }
 
     @Autowired
     private DeadlineClient client;
+    @Autowired
+    private NonWorkingDayClient nonWorkingDayClient;
 
     private CreationDeadline.CreationDeadlineBuilder creation() {
         return CreationDeadline.builder()
@@ -79,6 +81,23 @@ class DeadlineResourceFT {
         assertThat(created.getUserSnapshot().getMobile()).isEqualTo("600000109");
         assertThat(this.client.find(DeadlineFindCriteria.builder().userMobile("600000109").build()))
                 .extracting(Deadline::getId).contains(created.getId());
+    }
+
+    @Test
+    void testCreateSkipsAnApplicableHoliday() {
+        String city = "City FT " + UUID.randomUUID();
+        NonWorkingDay holiday = this.nonWorkingDayClient.create(NonWorkingDay.builder()
+                .date(LocalDate.of(2035, 5, 10))
+                .description("Festivo FT")
+                .scopeLevel(ScopeLevel.LOCAL)
+                .region("Region FT")
+                .city(city)
+                .build());
+        Deadline created = this.client.create(this.creation().city(city).build());
+        // 9-may-2035 es miércoles: el jueves 10 es festivo, cuentan vie 11, lun 14 y mar 15.
+        assertThat(created.getDueDate()).isEqualTo(LocalDate.of(2035, 5, 15));
+        assertThat(created.getNonWorkingDays()).extracting(NonWorkingDay::getId)
+                .containsExactly(holiday.getId());
     }
 
     @Test
