@@ -64,11 +64,16 @@ class DeadlineResourceFT {
 
         assertThat(created.getId()).isNotNull();
         assertThat(created.getTitle()).isEqualTo(creation.getTitle());
+        assertThat(created.getCourtFileNumber()).isEqualTo("500/2035");
+        assertThat(created.getNotificationDate()).isEqualTo(creation.getNotificationDate());
+        assertThat(created.getDays()).isEqualTo(3);
+        assertThat(created.getRegion()).isEqualTo("Region FT");
+        assertThat(created.getCity()).isEqualTo("City FT");
         assertThat(created.getStatus()).isEqualTo(DeadlineStatus.PENDING);
         assertThat(created.getDayCountType()).isEqualTo(DayCountType.WORKING);
         assertThat(created.getCreatedAt()).isNotNull();
         assertThat(created.getDueDate()).isEqualTo(LocalDate.of(2035, 5, 14));
-        assertThat(created.getNonWorkingDays()).isNullOrEmpty();
+        assertThat(created.getNonWorkingDays()).isEmpty();
         assertThat(created.getUserSnapshot().getId()).isEqualTo(LAWYER_FT);
         assertThat(created.getUserSnapshot().getMobile()).isEqualTo("600000109");
         assertThat(this.client.find(DeadlineFindCriteria.builder().userMobile("600000109").build()))
@@ -83,7 +88,7 @@ class DeadlineResourceFT {
         Deadline created = this.client.create(creation);
 
         assertThat(created.getDueDate()).isEqualTo(LocalDate.of(2035, 5, 19));
-        assertThat(created.getNonWorkingDays()).isNullOrEmpty();
+        assertThat(created.getNonWorkingDays()).isEmpty();
     }
 
     @Test
