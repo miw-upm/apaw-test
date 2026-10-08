@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -179,12 +180,11 @@ class DeadlineResourceFT {
 
     @Test
     void testFindByRegionReturnsSummary() {
-        assertThat(this.client.find(DeadlineFindCriteria.builder().region("Cataluña").build()))
-                .extracting(Deadline::getId)
+        List<Deadline> deadlines = this.client.find(DeadlineFindCriteria.builder().region("Cataluña").build());
+        assertThat(deadlines).extracting(Deadline::getId)
                 .contains(DEADLINE_ID_5, DEADLINE_ID_6, DEADLINE_ID_7)
                 .doesNotContain(DEADLINE_ID_0);
-        assertThat(this.client.find(DeadlineFindCriteria.builder().region("Cataluña").build()))
-                .allSatisfy(deadline -> {
+        assertThat(deadlines).allSatisfy(deadline -> {
                     assertThat(deadline.getNonWorkingDays()).isNull();
                     assertThat(deadline.getUserSnapshot().getMobile()).isEqualTo("600000101");
                     assertThat(deadline.getUserSnapshot().getFirstName()).isEqualTo("cliente1");
@@ -227,7 +227,8 @@ class DeadlineResourceFT {
 
     @Test
     void testFindWorkloadReport() {
-        assertThat(this.client.findWorkloadReport())
+        List<DeadlineWorkloadReport> reports = this.client.findWorkloadReport();
+        assertThat(reports)
                 .filteredOn(report -> "600000102".equals(report.getUserSnapshot().getMobile()))
                 .singleElement()
                 .satisfies(report -> {
@@ -236,7 +237,7 @@ class DeadlineResourceFT {
                     assertThat(report.getHolidayAffectedDeadlineCount()).isZero();
                     assertThat(report.getUserSnapshot().getFirstName()).isEqualTo("cliente2");
                 });
-        assertThat(this.client.findWorkloadReport()).first()
+        assertThat(reports).first()
                 .satisfies(report -> assertThat(report.getUserSnapshot().getMobile()).isEqualTo("600000100"));
     }
 }
