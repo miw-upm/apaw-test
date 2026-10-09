@@ -29,8 +29,8 @@ class SurveyResourceFT {
     private static final UUID QUESTION_0 = UUID.fromString("bbbbbbbb-cccc-dddd-eeee-ffffffff0000");
     private static final UUID QUESTION_2 = UUID.fromString("bbbbbbbb-cccc-dddd-eeee-ffffffff0002");
     private static final UUID UNKNOWN_ID = UUID.fromString("aaaaaaaa-bbbb-cccc-dddd-eeeeffff9999");
-    private static final UUID USER_0 = UUID.fromString("aaaaaaaa-bbbb-cccc-dddd-eeeeffff0010");
-    private static final UUID USER_2 = UUID.fromString("aaaaaaaa-bbbb-cccc-dddd-eeeeffff0012");
+    private static final UUID USER_0 = UUID.fromString("aaaaaaaa-bbbb-cccc-dddd-eeeeffff0000");
+    private static final UUID USER_3 = UUID.fromString("aaaaaaaa-bbbb-cccc-dddd-eeeeffff0003");
     private static final UUID USER_9 = UUID.fromString("aaaaaaaa-bbbb-cccc-dddd-eeeeffff0009");
     private static final UUID SURVEY_0 = UUID.fromString("cccccccc-dddd-eeee-ffff-aaaaaaaa0000");
     private static final UUID SURVEY_1 = UUID.fromString("cccccccc-dddd-eeee-ffff-aaaaaaaa0001");
@@ -93,8 +93,8 @@ class SurveyResourceFT {
                     assertThat(survey.getTitle()).isEqualTo("Student goals");
                     assertThat(survey.getLanguage()).isEqualTo("Spanish");
                     assertThat(survey.getSurveyQuestions()).isNull();
-                    assertThat(survey.getUserSnapshot().getMobile()).isEqualTo("600000121");
-                    assertThat(survey.getUserSnapshot().getFirstName()).isEqualTo("Carlos");
+                    assertThat(survey.getUserSnapshot().getMobile()).isEqualTo("600000101");
+                    assertThat(survey.getUserSnapshot().getFirstName()).isEqualTo("cliente1");
                 });
     }
 
@@ -146,15 +146,15 @@ class SurveyResourceFT {
         assertThat(report)
                 .filteredOn(row -> row.getUserSnapshot().getId().equals(USER_0) && row.getLanguage().equals("English"))
                 .singleElement().satisfies(row -> {
-                    assertThat(row.getUserSnapshot().getMobile()).isEqualTo("600000120");
-                    assertThat(row.getUserSnapshot().getFirstName()).isEqualTo("Lucía");
+                    assertThat(row.getUserSnapshot().getMobile()).isEqualTo("600000100");
+                    assertThat(row.getUserSnapshot().getFirstName()).isEqualTo("cliente0");
                     assertThat(row.getSurveyCount()).isGreaterThanOrEqualTo(1);
                     assertThat(row.getSurveyQuestionCount()).isGreaterThanOrEqualTo(2);
                 });
         assertThat(report)
-                .filteredOn(row -> row.getUserSnapshot().getId().equals(USER_2) && row.getLanguage().equals("English"))
+                .filteredOn(row -> row.getUserSnapshot().getId().equals(USER_3) && row.getLanguage().equals("English"))
                 .singleElement().satisfies(row -> {
-                    assertThat(row.getUserSnapshot().getMobile()).isEqualTo("600000122");
+                    assertThat(row.getUserSnapshot().getMobile()).isEqualTo("600000103");
                     assertThat(row.getSurveyQuestionCount()).isGreaterThanOrEqualTo(3);
                 });
     }
