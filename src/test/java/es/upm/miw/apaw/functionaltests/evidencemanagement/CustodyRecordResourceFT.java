@@ -14,6 +14,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
+import java.util.List;
 import java.util.UUID;
 
 import static java.time.temporal.ChronoUnit.MICROS;
@@ -57,10 +58,11 @@ class CustodyRecordResourceFT {
         assertThat(created.getAction()).isEqualTo(action);
         assertThat(created.getLocation()).isEqualTo("Laboratory");
         assertThat(created.getNotes()).isEqualTo("Original notes");
-        assertThat(created.getCustodian().getId()).isEqualTo(CUSTODIAN_ID_0);
+        this.assertHydrated(created.getCustodian(), this.custodian0());
         CustodyRecord stored = this.client.read(created.getId());
-        assertThat(stored).usingRecursiveComparison().ignoringFields("recordedAt").isEqualTo(created);
+        assertThat(stored).usingRecursiveComparison().ignoringFields("recordedAt", "custodian").isEqualTo(created);
         assertThat(stored.getRecordedAt()).isCloseTo(created.getRecordedAt(), within(1, MICROS));
+        assertThat(stored.getCustodian()).isEqualTo(this.custodian0());
 
         String updatedAction = "Feign updated " + UUID.randomUUID();
         CustodyRecord updated = this.client.update(created.getId(),
@@ -70,13 +72,13 @@ class CustodyRecordResourceFT {
         assertThat(updated.getDurationMinutes()).isNull();
         assertThat(updated.getLocation()).isNull();
         assertThat(updated.getNotes()).isNull();
-        assertThat(updated.getCustodian().getId()).isEqualTo(CUSTODIAN_ID_1);
+        this.assertHydrated(updated.getCustodian(), this.custodian1());
 
         CustodyRecord patched = this.client.patch(created.getId(),
                 new CustodyRecordPatchDto(null, null, null, "Patched notes", null));
         assertThat(patched.getNotes()).isEqualTo("Patched notes");
         assertThat(patched.getAction()).isEqualTo(updatedAction);
-        assertThat(patched.getCustodian().getId()).isEqualTo(CUSTODIAN_ID_1);
+        this.assertHydrated(patched.getCustodian(), this.custodian1());
 
         this.client.delete(created.getId());
         assertThatThrownBy(() -> this.client.read(created.getId())).isInstanceOf(FeignException.NotFound.class);
@@ -91,13 +93,18 @@ class CustodyRecordResourceFT {
         assertThat(custodyRecord.getAction()).isEqualTo("COLLECTED");
         assertThat(custodyRecord.getLocation()).isEqualTo("Crime scene");
         assertThat(custodyRecord.getNotes()).isEqualTo("Collected and sealed at the crime scene");
-        assertThat(custodyRecord.getCustodian().getId()).isEqualTo(CUSTODIAN_ID_0);
+        assertThat(custodyRecord.getCustodian()).isEqualTo(this.custodian0());
     }
 
     @Test
     void testFindAll() {
-        assertThat(this.client.findAll()).extracting(CustodyRecord::getId)
+        List<CustodyRecord> records = this.client.findAll();
+        assertThat(records).extracting(CustodyRecord::getId)
                 .containsSubsequence(ID_0, ID_1, ID_2, ID_3, ID_4, ID_5);
+        assertThat(records).filteredOn(item -> item.getId().equals(ID_0)).singleElement()
+                .extracting(CustodyRecord::getCustodian).isEqualTo(this.custodian0());
+        assertThat(records).filteredOn(item -> item.getId().equals(ID_1)).singleElement()
+                .extracting(CustodyRecord::getCustodian).isEqualTo(this.custodian1());
     }
 
     @Test
@@ -108,8 +115,7 @@ class CustodyRecordResourceFT {
                 .isSortedAccordingTo(Comparator.reverseOrder());
         assertThat(report).filteredOn(item -> item.getCustodian().getId().equals(CUSTODIAN_ID_1))
                 .singleElement().satisfies(item -> {
-                    assertThat(item.getCustodian().getFirstName()).isEqualTo("cliente1");
-                    assertThat(item.getCustodian().getMobile()).isEqualTo("600000101");
+                    assertThat(item.getCustodian()).isEqualTo(this.custodian1());
                     assertThat(item.getRecordsCount()).isGreaterThanOrEqualTo(3);
                     assertThat(item.getEvidencesCount()).isGreaterThanOrEqualTo(2);
                     assertThat(item.getTotalDurationMinutes()).isGreaterThanOrEqualTo(225);
@@ -187,5 +193,18 @@ class CustodyRecordResourceFT {
     void testDeleteMissingRecord() {
         UUID id = UUID.randomUUID();
         assertThatCode(() -> this.client.delete(id)).doesNotThrowAnyException();
+    }
+
+    private UserSnapshot custodian0() {
+        return UserSnapshot.builder().id(CUSTODIAN_ID_0).mobile("600000100").firstName("cliente0").build();
+    }
+
+    private UserSnapshot custodian1() {
+        return UserSnapshot.builder().id(CUSTODIAN_ID_1).mobile("600000101").firstName("cliente1").build();
+    }
+
+    private void assertHydrated(UserSnapshot actual, UserSnapshot expected) {
+        assertThat(actual).usingRecursiveComparison()
+                .comparingOnlyFields("id", "mobile", "firstName").isEqualTo(expected);
     }
 }
