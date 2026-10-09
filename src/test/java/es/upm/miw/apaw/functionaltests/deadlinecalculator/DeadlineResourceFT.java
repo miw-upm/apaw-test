@@ -77,8 +77,8 @@ class DeadlineResourceFT {
         assertThat(created.getCreatedAt()).isNotNull();
         assertThat(created.getDueDate()).isEqualTo(LocalDate.of(2035, 5, 14));
         assertThat(created.getNonWorkingDays()).isEmpty();
-        assertThat(created.getUserSnapshot().getId()).isEqualTo(LAWYER_FT);
-        assertThat(created.getUserSnapshot().getMobile()).isEqualTo("600000109");
+        assertThat(created.getLawyer().getId()).isEqualTo(LAWYER_FT);
+        assertThat(created.getLawyer().getMobile()).isEqualTo("600000109");
         assertThat(this.client.find(DeadlineFindCriteria.builder().userMobile("600000109").build()))
                 .extracting(Deadline::getId).contains(created.getId());
     }
@@ -205,8 +205,8 @@ class DeadlineResourceFT {
                 .doesNotContain(DEADLINE_ID_0);
         assertThat(deadlines).allSatisfy(deadline -> {
                     assertThat(deadline.getNonWorkingDays()).isNull();
-                    assertThat(deadline.getUserSnapshot().getMobile()).isEqualTo("600000101");
-                    assertThat(deadline.getUserSnapshot().getFirstName()).isEqualTo("cliente1");
+                    assertThat(deadline.getLawyer().getMobile()).isEqualTo("600000101");
+                    assertThat(deadline.getLawyer().getFirstName()).isEqualTo("cliente1");
                 });
     }
 
@@ -248,15 +248,15 @@ class DeadlineResourceFT {
     void testFindWorkloadReport() {
         List<DeadlineWorkloadReport> reports = this.client.findWorkloadReport();
         assertThat(reports)
-                .filteredOn(report -> "600000102".equals(report.getUserSnapshot().getMobile()))
+                .filteredOn(report -> "600000102".equals(report.getLawyer().getMobile()))
                 .singleElement()
                 .satisfies(report -> {
                     assertThat(report.getExpiredDeadlineCount()).isEqualTo(2);
                     assertThat(report.getTotalDeadlineCount()).isEqualTo(2);
                     assertThat(report.getHolidayAffectedDeadlineCount()).isZero();
-                    assertThat(report.getUserSnapshot().getFirstName()).isEqualTo("cliente2");
+                    assertThat(report.getLawyer().getFirstName()).isEqualTo("cliente2");
                 });
         assertThat(reports).first()
-                .satisfies(report -> assertThat(report.getUserSnapshot().getMobile()).isEqualTo("600000100"));
+                .satisfies(report -> assertThat(report.getLawyer().getMobile()).isEqualTo("600000100"));
     }
 }
