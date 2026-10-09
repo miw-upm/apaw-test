@@ -32,7 +32,7 @@ class CourseResourceFT {
     void testCreate() {
         Course course = Course.builder()
                 .name("New Test Course " + UUID.randomUUID())
-                .certificateReference("Ref-FT-1")
+                .certificateReference("Ref-FT-" + UUID.randomUUID())
                 .durationHours(40)
                 .online(true)
                 .launchDate(LocalDate.now())
