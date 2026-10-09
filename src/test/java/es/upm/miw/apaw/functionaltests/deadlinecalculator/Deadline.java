@@ -27,5 +27,5 @@ public class Deadline {
     private LocalDateTime createdAt;
     private LocalDate dueDate;
     private List<NonWorkingDay> nonWorkingDays;
-    private UserSnapshot userSnapshot;
+    private UserSnapshot lawyer;
 }
