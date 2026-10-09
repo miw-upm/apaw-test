@@ -133,8 +133,8 @@ class EvidenceResourceFT {
                 .contains(EVIDENCE_ID_0, EVIDENCE_ID_1, EVIDENCE_ID_2);
         assertThat(evidences).filteredOn(evidence -> evidence.getId().equals(EVIDENCE_ID_0))
                 .singleElement().satisfies(evidence -> assertThat(evidence.getCustodyRecords())
-                        .extracting(custodyRecord -> custodyRecord.getCustodian().getFirstName())
-                        .containsExactlyInAnyOrder("cliente0", "cliente1", "cliente1"));
+                        .extracting(CustodyRecord::getCustodian)
+                        .containsExactlyInAnyOrder(this.custodian0(), this.custodian1(), this.custodian1()));
     }
 
     @Test
@@ -198,5 +198,13 @@ class EvidenceResourceFT {
 
     private Evidence createEvidence(CustodyRecord custodyRecord) {
         return this.client.create(this.creation(List.of(custodyRecord.getId())));
+    }
+
+    private UserSnapshot custodian0() {
+        return UserSnapshot.builder().id(CUSTODIAN_ID_0).mobile("600000100").firstName("cliente0").build();
+    }
+
+    private UserSnapshot custodian1() {
+        return UserSnapshot.builder().id(CUSTODIAN_ID_1).mobile("600000101").firstName("cliente1").build();
     }
 }
