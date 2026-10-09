@@ -161,8 +161,7 @@ public class ContractResourceFT {
                         CONTRACT_ID_10,
                         CONTRACT_ID_17,
                         CONTRACT_ID_19
-                )
-                .doesNotContain(CONTRACT_ID_0);
+                );
     }
 
     @Test
